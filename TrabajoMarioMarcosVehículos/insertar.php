@@ -4,17 +4,117 @@
 <meta charset="UTF-8">
 <title>Insertar vehículo</title>
 <style>
-  body { font-family: Arial; background: #f3f4f6; text-align: center; }
-  form { background: white; padding: 30px; border-radius: 10px; display: inline-block; }
-  input, select { margin: 5px; padding: 8px; width: 90%; }
-  button { background: #1e3a8a; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer; }
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f3f4f6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+  }
+
+  h2 {
+    color: #1e3a8a;
+    margin-bottom: 20px;
+  }
+  form {
+    background-color: #fff;
+    padding: 30px 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 420px;
+    text-align: left;
+  }
+
+  input[type="text"],
+  select,
+  input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 6px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  label {
+    font-weight: bold;
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 5px;
+  }
+  .radio-group,
+  .checkbox-group {
+    margin-bottom: 10px;
+  }
+
+  .checkbox-group label {
+    display: block; /* cada servicio en línea separada */
+    font-weight: normal;
+    margin-bottom: 5px;
+  }
+
+  input[type="radio"],
+  input[type="checkbox"] {
+    margin-right: 5px;
+    transform: scale(1.1);
+  }
+  button {
+    width: 100%;
+    background-color: #1e3a8a;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 15px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  button:hover {
+    background-color: #2c52cc;
+  }
+  .success {
+    color: green;
+    font-weight: bold;
+    margin-top: 15px;
+  }
+
+  .error {
+    color: red;
+    font-weight: bold;
+  }
+
+  ul.error {
+    color: red;
+    margin-top: 10px;
+    padding-left: 20px;
+  }
+
+  a {
+    display: inline-block;
+    margin-top: 20px;
+    color: #1e3a8a;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
 </style>
 </head>
 <body>
 
 <h2>Insertar Vehículo</h2>
 <form action="" method="post" enctype="multipart/form-data">
-  <input type="text" name="cliente" placeholder="Nombre del cliente" required><br>
+  <input type="text" name="nombre" placeholder="Nombre del cliente" required><br>
   <select name="marca" required>
     <option value="">Seleccione marca</option>
     <option>Toyota</option>
@@ -57,125 +157,72 @@
 
 <?php
 
-try {
-    $conexion = new PDO("mysql:host=localhost;dbname=bd_daw2", "root", "");
-    $conexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    
-    $cliente = filter_input(INPUT_POST, 'cliente', FILTER_SANITIZE_STRING);
-    $marca = filter_input(INPUT_POST, 'marca', FILTER_SANITIZE_STRING);
-    $matricula = filter_input(INPUT_POST, 'matricula', FILTER_SANITIZE_STRING);
-    $tipo = filter_input(INPUT_POST, 'tipo', FILTER_SANITIZE_STRING);
-    $garantia = filter_input(INPUT_POST, 'garantia', FILTER_VALIDATE_INT);
-// Procesar imagen
-    $foto = $_FILES["foto"]["name"];
-    $tmp_imagen = $_FILES["foto"]["tmp_name"];
-    $ruta = "uploads/" . uniqid() . "_" . $foto;
-    
-    $errores = [];
+if (isset($_POST["insertar"])) {   // Solo se ejecuta tras enviar el formulario
+    try {
+        $conexion = new PDO("mysql:host=localhost;dbname=infovehiculos", "root", "");
+        $conexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    if (!$nombre) {$errores[] = "El nombre de usuario es obligatorio.";}
-    if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {$errores[] = "El email no es válido.";}
-    if (!$curso) {$errores[] = "El curso no es válido.";}
-    if (!$turno) {$errores[] = "Debes marcar un turno.";}
+        // Recoger y filtrar los datos
+        $cliente   = filter_input(INPUT_POST, 'nombre', FILTER_SANITIZE_STRING);
+        $marca     = filter_input(INPUT_POST, 'marca', FILTER_SANITIZE_STRING);
+        $matricula = filter_input(INPUT_POST, 'matricula', FILTER_SANITIZE_STRING);
+        $tipo      = filter_input(INPUT_POST, 'tipo', FILTER_SANITIZE_STRING);
+        $garantia  = filter_input(INPUT_POST, 'garantia', FILTER_VALIDATE_INT);
 
-    // Manejo de la imagen
-    $ruta = null;
-    if (!empty($_FILES["foto"]["name"])) {
-        $foto = $_FILES["foto"]["name"];
-        $tmp_imagen = $_FILES["foto"]["tmp_name"];
-        $ruta = "uploads/" . uniqid() . "_" . basename($foto);
+        $errores = [];
 
-        // Crear carpeta si no existe
-        if (!file_exists("uploads")) {
-            mkdir("uploads", 0777, true);
+        // Validaciones
+        if (!$cliente){ $errores[] = "El nombre del cliente es obligatorio.";}
+        if (!$marca){ $errores[] = "La marca es obligatoria.";}
+        if (!$matricula){ $errores[] = "La matrícula es obligatoria.";}
+        if (!$tipo){ $errores[] = "El tipo es obligatorio.";}
+        if ($garantia === false){ $errores[] = "La garantía debe ser un número válido.";}
+
+        // Procesar imagen
+        $ruta = null;
+        if (!empty($_FILES["imagen"]["name"])) {
+            $foto = $_FILES["imagen"]["name"];
+            $tmp_imagen = $_FILES["imagen"]["tmp_name"];
+            $ruta = "uploads/" . uniqid() . "_" . basename($foto);
+
+            if (!file_exists("uploads")){ mkdir("uploads", 0777, true);}
+
+            if (!move_uploaded_file($tmp_imagen, $ruta)) {
+                $errores[] = "Error al subir la imagen.";
+            }
         }
 
-        if (!move_uploaded_file($tmp_imagen, $ruta)) {
-            $errores[] = "Error al subir la imagen.";
+        // Solo insertar si no hay errores
+        if (empty($errores)) {
+            $sql = "INSERT INTO tvehiculos (nombre, marca, matricula, tipo, garantia, imagen)
+                    VALUES (:nombre, :marca, :matricula, :tipo, :garantia, :imagen)";
+            $stmt = $conexion->prepare($sql);
+            $stmt->execute([
+                ':nombre'    => $cliente,
+                ':marca'     => $marca,
+                ':matricula' => $matricula,
+                ':tipo'      => $tipo,
+                ':garantia'  => $garantia,
+                ':imagen'    => $ruta
+            ]);
+
+            echo "<p style='color: green; font-weight: bold;'>✅ Registro insertado correctamente.</p>";
+        } else {
+            echo "<h3 style='color: red;'>Errores en el formulario:</h3><ul style='color: red;'>";
+            foreach ($errores as $error) {
+                echo "<li>" . htmlspecialchars($error) . "</li>";
+            }
+            echo "</ul>";
         }
-    } else {
-        $errores[] = "No se seleccionó ninguna imagen.";
+
+    } catch (PDOException $e) {
+        echo "<p style='color: red;'>Error en la base de datos: " . htmlspecialchars($e->getMessage()) . "</p>";
     }
-
-    if (empty($errores)) {
-        $sql = "INSERT INTO talumnos (nombre, email, curso, turno, foto)
-                VALUES (:nombre, :email, :curso, :turno, :foto)";
-        $stmt = $conexion->prepare($sql);
-
-        $stmt->execute([
-            ':nombre' => $nombre,
-            ':email' => $email,
-            ':curso' => $curso,
-            ':turno' => $turno,
-            ':foto' => $ruta
-        ]);
-
-        echo "<p class='success'>Alumno insertado correctamente</p>";
-    } else {
-        echo "<h2 class='error'>Errores en el formulario:</h2><ul class='error'>";
-        foreach ($errores as $error) {
-            echo "<li>" . htmlspecialchars($error) . "</li>";
-        }
-        echo "</ul>";
-    }
-
-    echo "<a href='MarcosAcedo_PracticaPDO.html'>Volver al formulario</a>";
-
-} catch (PDOException $e) {
-    echo "<p class='error'>Error en la base de datos: " . htmlspecialchars($e->getMessage()) . "</p>";
 }
 
 
 
 
 
-if (isset($_POST['insertar'])) {
-    include 'conexion.php';
-
-    // ✅ Usamos filter_input() en lugar de $_POST[]
-    $cliente = filter_input(INPUT_POST, 'cliente', FILTER_SANITIZE_STRING);
-    $marca = filter_input(INPUT_POST, 'marca', FILTER_SANITIZE_STRING);
-    $matricula = filter_input(INPUT_POST, 'matricula', FILTER_SANITIZE_STRING);
-    $tipo = filter_input(INPUT_POST, 'tipo', FILTER_SANITIZE_STRING);
-    $garantia = filter_input(INPUT_POST, 'garantia', FILTER_VALIDATE_INT);
-
-    // Checkbox múltiple — se trata aparte
-    $servicios = "";
-    if (!empty($_POST['servicios']) && is_array($_POST['servicios'])) {
-        $servicios = implode(", ", array_map('htmlspecialchars', $_POST['servicios']));
-    }
-
-    // Subida de imagen (sin acceso directo inseguro)
-    $ruta = "";
-    if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
-        $carpeta = "uploads/";
-        if (!is_dir($carpeta)) mkdir($carpeta, 0777, true);
-        $nombreArchivo = basename($_FILES["imagen"]["name"]);
-        $ruta = $carpeta . $nombreArchivo;
-        move_uploaded_file($_FILES["imagen"]["tmp_name"], $ruta);
-    }
-
-    // Inserción con PDO y parámetros preparados
-    $stmt = $conexion->prepare("
-        INSERT INTO vehiculos (cliente, marca, matricula, tipo, garantia, servicios, imagen)
-        VALUES (:cliente, :marca, :matricula, :tipo, :garantia, :servicios, :imagen)
-    ");
-
-    $stmt->execute([
-        ':cliente' => $cliente,
-        ':marca' => $marca,
-        ':matricula' => $matricula,
-        ':tipo' => $tipo,
-        ':garantia' => $garantia,
-        ':servicios' => $servicios,
-        ':imagen' => $ruta
-    ]);
-
-    echo "<p>✅ Vehículo insertado correctamente.</p>";
-   if ($ruta) {
-        echo "<img src='$ruta' width='200'><br>";
-    }
-    echo "<a href='insertar.php'>Volver al formulario</a> | <a href='index.html'>Menú principal</a>";
-}
 
 
