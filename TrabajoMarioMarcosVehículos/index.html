@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/ClientSide/html.html to edit this template
+-->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Vehículos</title>
+  <style>
+    body {
+      background-color: #f5f6fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+    }
+
+    .container {
+      background-color: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 320px;
+    }
+
+    h2 {
+      margin-bottom: 30px;
+      color: #111827;
+      font-weight: 700;
+    }
+
+    .menu-button {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      background-color: #0b1a64;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 500;
+      transition: background-color 0.3s;
+    }
+
+    .menu-button:hover {
+      background-color: #1e3a8a;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Gestión de Vehículos</h2>
+
+    <form action="insertar.php" method="get">
+      <button class="menu-button" type="submit">Insertar vehículo</button>
+    </form>
+
+    <form action="mostrar.php" method="get">
+      <button class="menu-button" type="submit">Mostrar vehículos</button>
+    </form>
+
+    <form action="modificar.php" method="get">
+      <button class="menu-button" type="submit">Modificar vehículo</button>
+    </form>
+
+    <form action="eliminar.php" method="get">
+      <button class="menu-button" type="submit">Eliminar vehículo</button>
+    </form>
+  </div>
+</body>
+</html>
