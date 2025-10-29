@@ -107,6 +107,30 @@
 
   a:hover {
     text-decoration: underline;
+    
+    .botones {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.btn-volver {
+  flex: 1;
+  text-align: center;
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 15px;
+  text-decoration: none;
+  line-height: 1;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.btn-volver:hover {
+  background-color: #4b5563;
+}
   }
 </style>
 </head>
@@ -152,11 +176,14 @@
   <label>Imagen:</label><br>
   <input type="file" name="imagen"><br><br>
 
+  <div class="botones">
   <button type="submit" name="insertar">Guardar vehículo</button>
+  <a href="index.html" class="btn-volver">Volver</a>
+  </div>
+  
 </form>
 
 <?php
-
 if (isset($_POST["insertar"])) {   // Solo se ejecuta tras enviar el formulario
     try {
         $conexion = new PDO("mysql:host=localhost;dbname=infovehiculos", "root", "");
@@ -168,6 +195,11 @@ if (isset($_POST["insertar"])) {   // Solo se ejecuta tras enviar el formulario
         $matricula = filter_input(INPUT_POST, 'matricula', FILTER_SANITIZE_STRING);
         $tipo      = filter_input(INPUT_POST, 'tipo', FILTER_SANITIZE_STRING);
         $garantia  = filter_input(INPUT_POST, 'garantia', FILTER_VALIDATE_INT);
+
+        // Recoger servicios adicionales (pueden ser varios)
+        $servicios = isset($_POST['servicios']) && is_array($_POST['servicios'])
+            ? implode(', ', array_map('strip_tags', $_POST['servicios']))
+            : '';
 
         $errores = [];
 
@@ -194,8 +226,8 @@ if (isset($_POST["insertar"])) {   // Solo se ejecuta tras enviar el formulario
 
         // Solo insertar si no hay errores
         if (empty($errores)) {
-            $sql = "INSERT INTO tvehiculos (nombre, marca, matricula, tipo, garantia, imagen)
-                    VALUES (:nombre, :marca, :matricula, :tipo, :garantia, :imagen)";
+            $sql = "INSERT INTO tvehiculos (nombre, marca, matricula, tipo, garantia, servicios, imagen)
+                    VALUES (:nombre, :marca, :matricula, :tipo, :garantia, :servicios, :imagen)";
             $stmt = $conexion->prepare($sql);
             $stmt->execute([
                 ':nombre'    => $cliente,
@@ -203,15 +235,18 @@ if (isset($_POST["insertar"])) {   // Solo se ejecuta tras enviar el formulario
                 ':matricula' => $matricula,
                 ':tipo'      => $tipo,
                 ':garantia'  => $garantia,
+                ':servicios' => $servicios,
                 ':imagen'    => $ruta
             ]);
 
             echo "<p style='color: green; font-weight: bold;'>✅ Registro insertado correctamente.</p>";
         } else {
             echo "<h3 style='color: red;'>Errores en el formulario:</h3><ul style='color: red;'>";
+
             foreach ($errores as $error) {
                 echo "<li>" . htmlspecialchars($error) . "</li>";
             }
+
             echo "</ul>";
         }
 
@@ -219,6 +254,7 @@ if (isset($_POST["insertar"])) {   // Solo se ejecuta tras enviar el formulario
         echo "<p style='color: red;'>Error en la base de datos: " . htmlspecialchars($e->getMessage()) . "</p>";
     }
 }
+
 
 
 
