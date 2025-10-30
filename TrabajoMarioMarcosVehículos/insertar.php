@@ -209,6 +209,19 @@ if (isset($_POST["insertar"])) {   // Solo se ejecuta tras enviar el formulario
         if (!$matricula){ $errores[] = "La matrícula es obligatoria.";}
         if (!$tipo){ $errores[] = "El tipo es obligatorio.";}
         if ($garantia === false){ $errores[] = "La garantía debe ser un número válido.";}
+        
+        // Validación específica de matrícula (4 números + 3 letras sin vocales)
+        if ($matricula) {
+            // Eliminar espacios y convertir a mayúsculas para la validación
+            $matricula_limpia = strtoupper(trim($matricula));
+            
+            // Patrón: 4 números seguidos de 3 letras que no sean vocales
+            $patron = '/^[0-9]{4}[BCDFGHJKLMNPQRSTVWXYZ]{3}$/';
+            
+            if (!preg_match($patron, $matricula_limpia)) {
+                $errores[] = "El formato de la matrícula no es válido. Debe ser: 4 números seguidos de 3 letras (sin vocales). Ejemplo: 1234BCD";
+            }
+        }
 
         // Procesar imagen
         $ruta = null;
@@ -254,11 +267,3 @@ if (isset($_POST["insertar"])) {   // Solo se ejecuta tras enviar el formulario
         echo "<p style='color: red;'>Error en la base de datos: " . htmlspecialchars($e->getMessage()) . "</p>";
     }
 }
-
-
-
-
-
-
-
-

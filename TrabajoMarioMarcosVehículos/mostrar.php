@@ -109,7 +109,7 @@ $vehiculos = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <td><?= htmlspecialchars($a["marca"]) ?></td>
   <td><?= htmlspecialchars($a["matricula"]) ?></td>
   <td><?= htmlspecialchars($a["tipo"]) ?></td>
-  <td><?= htmlspecialchars($a["garantia"]) ?></td>
+  <td><?= $a["garantia"] == 1 ? "Sí" : "No" ?></td>
   <td><?= htmlspecialchars($a["servicios"]) ?></td>
   <td>
     <?php if (!empty($a["imagen"])): ?>
@@ -126,4 +126,3 @@ $vehiculos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <a href="index.html">Volver</a>
 </body>
 </html>
-

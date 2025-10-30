@@ -151,14 +151,14 @@ function confirmarGuardado() {
     <input type="text" name="matricula" value="<?= htmlspecialchars($vehiculo['matricula']) ?>" required>
 
     <label>Garantía:</label>
-<div style="display: flex; gap: 15px; margin-bottom: 15px;">
-  <label>
-    <input type="radio" name="garantia" value="1" <?= $vehiculo['garantia'] == 1 ? 'checked' : '' ?>> Sí
-  </label>
-  <label>
-    <input type="radio" name="garantia" value="0" <?= $vehiculo['garantia'] == 0 ? 'checked' : '' ?>> No
-  </label>
-</div>  
+    <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+        <label>
+        <input type="radio" name="garantia" value="1" <?= $vehiculo['garantia'] == 1 ? 'checked' : '' ?>> Sí
+        </label>
+        <label>
+        <input type="radio" name="garantia" value="0" <?= $vehiculo['garantia'] == 0 ? 'checked' : '' ?>> No
+        </label>
+    </div>  
     <div style="display: flex; gap: 10px;">
       <button type="submit" name="guardar">Guardar cambios</button>
       <a href="modificar.php">Cancelar</a>
