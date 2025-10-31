@@ -143,6 +143,7 @@ function confirmarGuardado() {
 <?php if (!empty($mensaje)): ?>
   <div class="mensaje"><?= htmlspecialchars($mensaje) ?></div>
   <a href="modificar.php">Volver a la lista</a>
+
 <?php elseif (isset($vehiculo)): ?>
   <form method="post" onsubmit="return confirmarGuardado()">
     <input type="hidden" name="id" value="<?= htmlspecialchars($vehiculo['id']) ?>">
@@ -164,6 +165,7 @@ function confirmarGuardado() {
       <a href="modificar.php">Cancelar</a>
     </div>
   </form>
+
 <?php else: ?>
 
 <?php if (empty($vehiculos)): ?>
@@ -188,7 +190,10 @@ function confirmarGuardado() {
       <td><?= htmlspecialchars($a["marca"]) ?></td>
       <td><?= htmlspecialchars($a["matricula"]) ?></td>
       <td><?= htmlspecialchars($a["tipo"]) ?></td>
-      <td><?= htmlspecialchars($a["garantia"]) ?></td>
+
+      <!-- ✅ Aquí cambiamos la garantía para mostrar “Sí” o “No” -->
+      <td><?= $a["garantia"] == 1 ? "Sí" : "No" ?></td>
+
       <td><?= htmlspecialchars($a["servicios"]) ?></td>
       <td>
         <?php if (!empty($a["imagen"])): ?>
